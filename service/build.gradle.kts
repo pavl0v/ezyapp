@@ -27,6 +27,15 @@ dependencies {
 
     runtimeOnly("com.fasterxml.jackson.module:jackson-module-kotlin")
 
+    // kotlinx
+    implementation("org.jetbrains.kotlinx:kotlinx-coroutines-core:1.6.4")
+    implementation("org.jetbrains.kotlinx:kotlinx-coroutines-rx2:1.6.4")
+    implementation("io.vertx:vertx-lang-kotlin-coroutines:4.3.3")
+
+    // database
+    implementation("org.postgresql:postgresql:42.4.2")
+    implementation("io.micronaut.sql:micronaut-vertx-pg-client:4.6.3")
+    implementation("com.ongres.scram:client:2.1")
 }
 
 
