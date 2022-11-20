@@ -21,21 +21,28 @@ class ItemsController(
         return try {
             client.query(ItemSpec(id = UUID.fromString(id)))
         } catch (ex: Exception) {
-            println(ex)
+            logger.error(ex.message, ex)
             emptyList()
         }
     }
 
     @Get("/create")
-    suspend fun createItem() {
+    suspend fun createItem(): Int {
         val item1 = Item(name = "name1-" + UUID.randomUUID().toString().take(4))
         val item2 = Item(name = "name2-" + UUID.randomUUID().toString().take(4))
         val item3 = Item(name = "name3-" + UUID.randomUUID().toString().take(4))
 
-        val spec1 = NewItemSpec(item1)
-        val spec2 = NewItemSpec(item2)
-        val spec3 = NewItemSpec(item3)
+        val specs = listOf(
+            NewItemSpec(item1),
+            NewItemSpec(item2),
+            NewItemSpec(item3),
+        )
 
-        client.executeTransaction(spec1, spec2, spec3)
+        return try {
+            client.executeTransaction(specs) ?: 0
+        } catch (ex: Exception) {
+            logger.error(ex.message, ex)
+            -1
+        }
     }
 }
