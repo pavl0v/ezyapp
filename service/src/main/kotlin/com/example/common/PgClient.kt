@@ -3,9 +3,8 @@ package com.example.common
 import io.reactivex.Maybe
 import io.reactivex.Single
 import io.vertx.reactivex.pgclient.PgPool
-import io.vertx.reactivex.sqlclient.Row
-import io.vertx.reactivex.sqlclient.RowSet
 import io.vertx.reactivex.sqlclient.SqlConnection
+import io.vertx.reactivex.sqlclient.SqlResult
 import jakarta.inject.Inject
 import jakarta.inject.Singleton
 import kotlinx.coroutines.Dispatchers
@@ -32,26 +31,14 @@ class PgClient(
         }
     }
 
-    fun executeTransaction(spec1: ExecuteSpec, spec2: ExecuteSpec, spec3: ExecuteSpec) {
-        val f = listOf<ExecuteSpec>(
-            spec1, spec2, spec3
-        )
-
-        pgPool.rxWithTransaction(fun(tx: SqlConnection): Maybe<RowSet<Row>> {
-            val lst = f.flatMap {
-                listOf(tx.preparedQuery(it.sql).rxExecute(it.parameters))
-            }
-            val res = Single.zip(lst, fun(arr: Array<Any>): RowSet<Row> {
-                return arr[arr.lastIndex] as RowSet<Row>
-            }).toMaybe()
-            return res
-
-//            return tx.preparedQuery(spec1.sql).rxExecute(spec1.parameters).flatMap {
-//                tx.preparedQuery(spec2.sql).rxExecute(spec2.parameters).flatMap {
-//                    tx.preparedQuery(spec3.sql).rxExecute(spec3.parameters)
-//                }
-//            }
-//            .toMaybe()
-        }).blockingGet()
+    suspend fun executeTransaction(specs: List<ExecuteSpec>): Int? {
+        return withContext(Dispatchers.IO) {
+            pgPool.rxWithTransaction(fun(tx: SqlConnection): Maybe<Int> {
+                val sources = specs.map { tx.preparedQuery(it.sql).rxExecute(it.parameters) }
+                return Single.zip(sources, fun(results: Array<Any>): Int {
+                    return results.sumOf { (it as SqlResult<*>).rowCount() }
+                }).toMaybe()
+            }).toDeferred(this)
+        }
     }
 }
