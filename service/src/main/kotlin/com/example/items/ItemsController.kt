@@ -26,7 +26,7 @@ class ItemsController(
             client.query(
                 ItemSpec(id = UUID.fromString(id))
             ).first().toGetItemResponse()
-        } catch (ex: Exception) {
+        } catch (ex: RuntimeException) {
             logger.error(ex.message, ex)
             throw ex
         }
@@ -38,7 +38,7 @@ class ItemsController(
             val item = request.toItem()
             client.execute(NewItemSpec(item))
             return CreateItemResponse(item.id)
-        } catch (ex: Exception) {
+        } catch (ex: RuntimeException) {
             logger.error(ex.message, ex)
             throw ex
         }

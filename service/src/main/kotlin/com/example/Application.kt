@@ -1,6 +1,6 @@
 package com.example
 
-import io.micronaut.runtime.Micronaut.*
+import io.micronaut.runtime.Micronaut.run
 import io.swagger.v3.oas.annotations.OpenAPIDefinition
 import io.swagger.v3.oas.annotations.info.Info
 
@@ -11,6 +11,7 @@ import io.swagger.v3.oas.annotations.info.Info
 		description = "ezyapp API description"
 	)
 )
+@Suppress("SpreadOperator")
 object Application {
 	@JvmStatic
 	fun main(args: Array<String>) {
