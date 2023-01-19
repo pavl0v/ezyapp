@@ -101,3 +101,9 @@ tasks.withType<io.gitlab.arturbosch.detekt.Detekt>().configureEach {
         md.required.set(true)
     }
 }
+
+tasks.withType<org.jetbrains.kotlin.gradle.internal.KaptGenerateStubsTask> {
+    kotlinOptions {
+        jvmTarget = "17"
+    }
+}
